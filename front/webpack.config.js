@@ -1,9 +1,13 @@
 const path = require("path");
 
-module.exports = {
+let webpackCommonConfig = {
+  name: "commonConfig",
   resolve: {
+    extensions: [".js", ".vue", ".json", ".scss"],
+    // modules: [path.resolve(__dirname, "src"), "node_modules"],
     alias: {
-      "@": path.resolve(__dirname, "src/"),
+      "@": resolve("src/"),
+      "@page": resolve("src/pages/"),
     },
   },
   rules: [
@@ -25,3 +29,9 @@ module.exports = {
     },
   ],
 };
+
+module.exports = webpackCommonConfig;
+
+function resolve(dir) {
+  return path.join(__dirname, ".", dir);
+}
