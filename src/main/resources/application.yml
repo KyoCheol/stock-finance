@@ -10,12 +10,15 @@ spring:
     suffix: .html
 
   jpa:
-    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-    open-in-view: false
-    show-sql: true
     hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-    defer-datasource-initialization: true
+      use-new-id-generator-mappings: false
+
+#  mvc:
+#    static-path-pattern: /static/**
+
+server:
+  port: 8080
+
+jwt:
+  secret:
+    signature: "SEOKYOCHEOL"
