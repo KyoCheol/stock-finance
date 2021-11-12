@@ -41,7 +41,9 @@
 
     <v-row>
       <v-col md="8" sm="6">
-        <v-card outlined title style="height: 300px" color="#1F7087"> </v-card>
+        <v-card outlined title style="height: 300px" color="#1F7087">
+          <NewsCompo />
+        </v-card>
       </v-col>
       <v-col md="4" sm="6">
         <v-card outlined title style="height: 300px" color="#1F7087"> </v-card>
@@ -52,12 +54,15 @@
 
 <script>
 import Carousel from "@/components/common/Carousel";
+import NewsCompo from "@/views/News";
 
 export default {
   name: "HelloWorld",
   components: {
     Carousel,
+    NewsCompo,
   },
   data: () => ({}),
 };
 </script>
+
