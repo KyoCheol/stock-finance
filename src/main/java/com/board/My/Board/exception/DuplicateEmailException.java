@@ -1,4 +1,16 @@
-package com.board.My.Board.exception;
+package com.board.seochu.finance.exception.custom;
 
-public class DuplicateEmailException extends RuntimeException {
+public class DuplicatedException extends RuntimeException {
+
+    public DuplicatedException(String msg, Throwable t) {
+        super(msg, t);
+    }
+
+    public DuplicatedException(String msg) {
+        super(msg);
+    }
+
+    public DuplicatedException() {
+        super();
+    }
 }
