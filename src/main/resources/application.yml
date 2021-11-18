@@ -22,3 +22,8 @@ server:
 jwt:
   secret:
     signature: "SEOKYOCHEOL"
+
+hendisantika:
+  app:
+    jwtSecret: "jwtSecretKey"
+    jwtExpiration: 86400
