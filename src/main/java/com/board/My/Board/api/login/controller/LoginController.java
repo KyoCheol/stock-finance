@@ -1,60 +1,123 @@
 package com.board.seochu.finance.api.login.controller;
 
 import com.board.seochu.finance.api.login.dto.AuthenticationDto;
-import com.board.seochu.finance.api.login.dto.LoginDto;
+import com.board.seochu.finance.api.login.dto.LoginDTO;
+import com.board.seochu.finance.api.login.dto.SignDTO;
 import com.board.seochu.finance.api.login.service.LoginService;
-import com.board.seochu.finance.api.register.dto.RegisterDto;
-import com.board.seochu.finance.api.register.service.RegisterService;
-import com.board.seochu.finance.util.auth.AuthProvider;
-import lombok.RequiredArgsConstructor;
+import com.board.seochu.finance.api.role.domain.entity.Role;
+import com.board.seochu.finance.api.role.domain.entity.RoleName;
+import com.board.seochu.finance.api.role.domain.repository.RoleRepository;
+import com.board.seochu.finance.api.user.domain.entity.User;
+import com.board.seochu.finance.api.user.domain.repository.UserRepository;
+import com.board.seochu.finance.util.auth.jwt.JwtProvider;
+import com.board.seochu.finance.util.auth.jwt.JwtResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
-@RequestMapping(value = {""}, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping("/api/auth")
 public class LoginController {
 
-    private final LoginService loginService;
-    private final AuthProvider authProvider;
-    private final RegisterService registerService;
+    @Autowired
+    AuthenticationManager authenticationManager;
 
-    /**
-     * method 설명 : 회원가입
-     * param joinDto
-     * throws Exception
-     */
-    @PostMapping(value = {"/api/register"})
-    public ResponseEntity<Boolean> register(@Valid @RequestBody RegisterDto registerDto) throws  Exception {
-        return ResponseEntity.ok().body(registerService.regMember(registerDto));
-    }
+    @Autowired
+    UserRepository userRepository;
 
-    /**
-     * method 설명 : 로그인
-     * param loginDto
-     * throws Exception
-     */
-    @PostMapping(value = {"/signin"})
-    public ResponseEntity<AuthenticationDto> login(@Valid @RequestBody LoginDto loginDto) throws Exception {
+    @Autowired
+    RoleRepository roleRepository;
 
-        log.info(" S I G N I N =====================>> ");
-        AuthenticationDto authentication = loginService.loginMember(loginDto);
+    @Autowired
+    PasswordEncoder encoder;
+
+    @Autowired
+    JwtProvider jwtProvider;
+
+    @Autowired
+    LoginService loginService;
+
+    @PostMapping("/signin")
+    public ResponseEntity<AuthenticationDto> authenticateUser(@Valid @RequestBody LoginDTO loginRequest) {
+
+        AuthenticationDto authenticationDto = loginService.login(loginRequest);
+
+        log.info(" S T E P 2 > > > > ");
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authenticationDto.getUsername(),
+                        loginRequest.getPassword()
+                )
+        );
+
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//        String jwt = jwtProvider.generateJwtToken(authentication);
 
         return ResponseEntity.ok()
-                .header("accesstoken", authProvider
-                        .createToken(
-                                authentication.getId(),
-                                authentication.getEmail(),
-                                "USER"))
-                .body(authentication);
+                .header("accesstoken", jwtProvider.generateJwtToken(authentication))
+                .body(authenticationDto);
     }
 
+    @PostMapping("/signup")
+    public ResponseEntity<String> registerUser(@Valid @RequestBody SignDTO signUpRequest) {
+        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            return new ResponseEntity<String>("Fail -> Username is already taken!",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            return new ResponseEntity<String>("Fail -> Email is already in use!",
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        // Creating user's account
+//        User user = new User(signUpRequest.getName(), signUpRequest.getUsername(),
+//                signUpRequest.getEmail(), encoder.encode(signUpRequest.getPassword()));
+
+        User user = new User();
+
+        Set<String> strRoles = signUpRequest.getRole();
+        Set<Role> roles = new HashSet<>();
+
+        strRoles.forEach(role -> {
+            switch (role) {
+                case "admin":
+                    Role adminRole = roleRepository.findByName(RoleName.ROLE_ADMIN)
+                            .orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
+                    roles.add(adminRole);
+
+                    break;
+                case "pm":
+                    Role pmRole = roleRepository.findByName(RoleName.ROLE_PM)
+                            .orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
+                    roles.add(pmRole);
+
+                    break;
+                default:
+                    Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+                            .orElseThrow(() -> new RuntimeException("Fail! -> Cause: User Role not find."));
+                    roles.add(userRole);
+            }
+        });
+
+        //user.setRoles(roles);
+        user.setPassword(encoder.encode(signUpRequest.getPassword()));
+        user.setRoles(roles);
+
+        userRepository.save(signUpRequest.toEntity());
+
+        return ResponseEntity.ok().body("User registered successfully!");
+    }
 }
