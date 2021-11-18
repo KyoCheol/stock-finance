@@ -1,29 +1,32 @@
 package com.board.seochu.finance.api.login.dto;
 
-import com.board.seochu.finance.api.member.domain.entity.Members;
+import com.board.seochu.finance.api.user.domain.entity.User;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
-@Setter
 @Getter
-@NoArgsConstructor
-public class LoginDto {
+@Setter
+public class LoginDTO {
+//    @NotBlank
+//    @Size(min = 3, max = 60)
+//    private String username;
 
-    @NotBlank(message = "'email' is a required input value")
+    @NotBlank
+    @Size(min = 6, max = 40)
+    private String password;
+
     @Email(message = "It is not in email format")
     private String email;
 
-    @NotBlank(message = "'password' is a required input value")
-    private String password;
-
-    public Members toEntity() {
-        Members build = Members.builder()
-                .email(email)
+    public User toEntity() {
+        User build = User.builder()
+//                .username(username)
                 .password(password)
+                .email(email)
                 .build();
 
         return build;
