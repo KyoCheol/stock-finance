@@ -1,4 +1,4 @@
-package com.board.seochu.finance.exception.custom;
+package com.board.seochu.finance.exception;
 
 public class UserNotFoundException extends RuntimeException {
 

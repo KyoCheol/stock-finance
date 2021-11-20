@@ -1,4 +1,4 @@
-package com.board.seochu.finance.api.news;
+package com.board.seochu.finance.api.news.service;
 
 import com.board.seochu.finance.common.consts.StcConst;
 import com.board.seochu.finance.api.news.dto.NewsVO;

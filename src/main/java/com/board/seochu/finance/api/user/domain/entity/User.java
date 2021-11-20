@@ -63,7 +63,10 @@ public class User {
         this.roles = roles;
     }
 
-    public User() {
-
+    public User(String name, String username, String email) {
+        this.name = name;
+        this.username = username;
+        this.email = email;
+        //this.roles = roles;
     }
 }

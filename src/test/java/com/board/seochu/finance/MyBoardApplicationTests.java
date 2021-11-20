@@ -1,4 +1,4 @@
-package com.board.My.Board;
+package com.board.seochu.finance;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

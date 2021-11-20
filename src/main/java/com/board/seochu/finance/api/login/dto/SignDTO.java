@@ -1,6 +1,5 @@
 package com.board.seochu.finance.api.login.dto;
 
-import com.board.seochu.finance.api.role.domain.entity.Role;
 import com.board.seochu.finance.api.user.domain.entity.User;
 import lombok.Getter;
 import lombok.Setter;

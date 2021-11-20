@@ -1,4 +1,4 @@
-package com.board.seochu.finance.exception.custom;
+package com.board.seochu.finance.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

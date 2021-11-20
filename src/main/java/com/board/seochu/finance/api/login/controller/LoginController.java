@@ -10,7 +10,6 @@ import com.board.seochu.finance.api.role.domain.repository.RoleRepository;
 import com.board.seochu.finance.api.user.domain.entity.User;
 import com.board.seochu.finance.api.user.domain.repository.UserRepository;
 import com.board.seochu.finance.util.auth.jwt.JwtProvider;
-import com.board.seochu.finance.util.auth.jwt.JwtResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -54,7 +52,6 @@ public class LoginController {
 
         AuthenticationDto authenticationDto = loginService.login(loginRequest);
 
-        log.info(" S T E P 2 > > > > ");
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         authenticationDto.getUsername(),
@@ -86,7 +83,8 @@ public class LoginController {
 //        User user = new User(signUpRequest.getName(), signUpRequest.getUsername(),
 //                signUpRequest.getEmail(), encoder.encode(signUpRequest.getPassword()));
 
-        User user = new User();
+        User user = new User(signUpRequest.getName(), signUpRequest.getUsername(),
+                signUpRequest.getEmail());
 
         Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();
@@ -116,7 +114,7 @@ public class LoginController {
         user.setPassword(encoder.encode(signUpRequest.getPassword()));
         user.setRoles(roles);
 
-        userRepository.save(signUpRequest.toEntity());
+        userRepository.save(user);
 
         return ResponseEntity.ok().body("User registered successfully!");
     }

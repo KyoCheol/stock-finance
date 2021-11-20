@@ -1,4 +1,4 @@
-package com.board.My.Board;
+package com.board.seochu.finance;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
