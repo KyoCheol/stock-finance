@@ -58,7 +58,7 @@ const actions = {
       password: password,
     };
 
-    let apiUrl = COMMON_CONST.API_URL + "/signin";
+    let apiUrl = COMMON_CONST.API_URL + "/api/auth/signin";
 
     axios
       .post(apiUrl, JSON.stringify(params), {

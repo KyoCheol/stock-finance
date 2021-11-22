@@ -5,13 +5,30 @@ spring:
     username: root
     password: as741023##
 
-  thymeleaf:
-    prefix: classpath:/static/
-    suffix: .html
+#  thymeleaf:
+#    prefix: classpath:/templates
+#    suffix: .html
+#    mode: LEGACYHTML5
+#    check-template-location: true
+
 
   jpa:
     hibernate:
       use-new-id-generator-mappings: false
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kok1434@gmail.com
+    password: as741023##
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enalble: true
+            required: true
+          validTime : 5000
 
 #  mvc:
 #    static-path-pattern: /static/**
@@ -27,3 +44,6 @@ hendisantika:
   app:
     jwtSecret: "jwtSecretKey"
     jwtExpiration: 86400
+
+
+

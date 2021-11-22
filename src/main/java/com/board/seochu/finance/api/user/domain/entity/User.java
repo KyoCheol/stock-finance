@@ -69,4 +69,8 @@ public class User {
         this.email = email;
         //this.roles = roles;
     }
+
+    public User() {
+
+    }
 }

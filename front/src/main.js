@@ -7,6 +7,7 @@ import "vuetify/dist/vuetify.min.css";
 Vue.config.productionTip = false;
 
 import { getAxios } from "./config/axios/axiosConfig";
+import vuetify from "./plugins/vuetify";
 Vue.prototype.$http = getAxios;
 
 //Vue.use(vuetify, {
@@ -18,6 +19,6 @@ Vue.prototype.$http = getAxios;
 new Vue({
   router,
   store,
-//  vuetify,
+  vuetify,
   render: (h) => h(App),
 }).$mount("#app");
