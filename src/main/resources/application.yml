@@ -1,16 +1,23 @@
 spring:
+  profiles:
+    active: local
+
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/board?serverTimezone=Asia/Seoul
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:mysql://localhost:3306/board?characterEncoding=UTF-8&serverTimezone=UTC
     username: root
     password: as741023##
 
-#  thymeleaf:
+    #연결 여부 확인을 위한 테스트 처리
+    hikari:
+      connection-test-query: SELECT 1
+
+  #  thymeleaf:
 #    prefix: classpath:/templates
 #    suffix: .html
 #    mode: LEGACYHTML5
 #    check-template-location: true
-
 
   jpa:
     hibernate:
@@ -46,4 +53,6 @@ hendisantika:
     jwtExpiration: 86400
 
 
-
+# logging
+logging:
+  config: classpath:logback-${spring.profiles.active}.xml
