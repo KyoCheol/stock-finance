@@ -11,7 +11,15 @@
         <result column="REPLY"    property="reply"    jdbcType="INTEGER"/>
     </resultMap>
 
-    <select id="getBoardList" resultMap="boardResult" >
+    <resultMap id="replyResult" type="com.board.seochu.finance.api.board.dto.ReplyDto">
+        <result column="REPLY_NO" property="replyNo" jdbcType="INTEGER"/>
+        <result column="DOC_NO"   property="docNo"   jdbcType="INTEGER"/>
+        <result column="WRITER"   property="writer"  jdbcType="VARCHAR"/>
+        <result column="CONTENT"  property="content" jdbcType="VARCHAR"/>
+        <result column="REG_DTTM" property="regDttm" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="getBoardList" resultMap="boardResult" parameterType="com.board.seochu.finance.api.board.dto.BoardDto">
         SELECT A.DOC_NO, A.TITLE, A.CONTENT, A.WRITER, A.REG_DTTM, A.VIEW, A.REPLY
           FROM (
             SELECT A.*, (@ROWNUM := @ROWNUM + 1) AS ROWNUM
@@ -34,8 +42,8 @@
                     </if>
                 </where>
                 ORDER BY
-                <foreach collection="boardDto.test" item="boardDto.test" index="index" separator=",">
-                    ${boardDto.test}
+                <foreach collection="boardDto.convertSort" item="item" index="index" separator=",">
+                    ${item}
                 </foreach>
                 ) A, (SELECT @ROWNUM := 0) TEMP
             ) A
@@ -69,4 +77,121 @@
         INSERT INTO TB_BOARD (DOC_NO, TITLE, CONTENT, WRITER)
         VALUES (#{boardDto.docNo}, #{boardDto.title}, #{boardDto.content}, #{boardDto.writer})
     </insert>
+
+    <update id="increaseCount" parameterType="com.board.seochu.finance.api.board.dto.BoardDto">
+        UPDATE TB_BOARD
+           SET VIEW = VIEW + 1
+         WHERE DOC_NO = #{docNo}
+    </update>
+
+    <select id="selectBoardDetail" parameterType="com.board.seochu.finance.api.board.dto.BoardDto" resultMap="boardResult">
+        SELECT A.DOC_NO
+             , A.TITLE
+             , A.CONTENT
+             , A.WRITER
+             , A.REG_DTTM
+             , A.VIEW
+             , A.LIKE_CNT
+             , A.UNLIKE_CNT
+             , (SELECT COUNT(*) FROM TB_REPLY X WHERE X.DOC_NO = A.DOC_NO) AS REPLY
+        FROM TB_BOARD A
+        WHERE A.DOC_NO = #{docNo}
+    </select>
+
+    <select id="getReplyList" resultMap="replyResult" parameterType="com.board.seochu.finance.api.board.dto.ReplyDto">
+        SELECT REPLY_NO, DOC_NO, WRITER, CONTENT, REG_DTTM
+        FROM TB_REPLY
+        WHERE DOC_NO = #{docNo}
+    </select>
+
+    <insert id="insertReply" parameterType="com.board.seochu.finance.api.board.dto.ReplyDto">
+        <selectKey resultType="int" keyProperty="replyDto.replyNo" order="BEFORE">
+            SELECT IFNULL(MAX(REPLY_NO), 0) + 1 AS REPLY_NO FROM TB_REPLY WHERE DOC_NO = #{replyDto.docNo}
+        </selectKey>
+        INSERT INTO TB_REPLY (REPLY_NO, DOC_NO, WRITER, CONTENT)
+        VALUES (#{replyDto.replyNo}, #{replyDto.docNo}, #{replyDto.writer}, #{replyDto.content})
+    </insert>
+
+    <update id="updateReply" parameterType="com.board.seochu.finance.api.board.dto.ReplyDto">
+        UPDATE TB_REPLY
+        SET CONTENT = #{replyDto.content}
+        WHERE REPLY_NO = #{replyDto.replyNo}
+          AND DOC_NO = #{replyDto.docNo}
+    </update>
+
+    <delete id="deleteReply" parameterType="com.board.seochu.finance.api.board.dto.ReplyDto">
+        DELETE FROM TB_REPLY
+        WHERE DOC_NO = #{replyDto.docNo}
+        <if test="replyDto.replyNo > 0">
+            AND REPLY_NO = #{replyDto.replyNo}
+        </if>
+    </delete>
+
+    <select id="countByLike" parameterType="com.board.seochu.finance.api.board.dto.LikeDto" resultType="com.board.seochu.finance.api.board.dto.LikeDto">
+        SELECT likeno, boardno, mno, like_check, unLike_check
+          FROM TB_LIKETO
+         WHERE boardno=#{likeDto.boardno} AND mno=#{likeDto.mno}
+    </select>
+
+    <insert id="insertLike" parameterType="com.board.seochu.finance.api.board.dto.LikeDto">
+        <selectKey resultType="int" keyProperty="likeNo" order="BEFORE">
+            SELECT IFNULL(MAX(likeno), 0) + 1 AS likeno FROM TB_LIKETO
+        </selectKey>
+        INSERT INTO TB_LIKETO (likeno, boardno, mno, like_check, unLike_check)
+        VALUES (#{likeNo}, #{likeDto.boardno}, #{likeDto.mno}, 0, 0)
+    </insert>
+
+    <update id="checkLike" parameterType="com.board.seochu.finance.api.board.dto.LikeDto">
+        UPDATE TB_LIKETO
+           SET like_check = like_check + 1
+        WHERE mno=#{likeDto.mno} AND boardno=#{likeDto.boardno}
+    </update>
+
+    <update id="checkUnLike" parameterType="com.board.seochu.finance.api.board.dto.LikeDto">
+        UPDATE TB_LIKETO
+           SET like_check = 0
+         WHERE mno=#{likeDto.mno} AND boardno=#{likeDto.boardno}
+    </update>
+
+    <update id="likeCntUpByBoard" parameterType="com.board.seochu.finance.api.board.dto.BoardDto">
+        UPDATE TB_BOARD
+        SET LIKE_CNT = LIKE_CNT + 1
+        WHERE DOC_NO=#{docNo}
+    </update>
+
+    <update id="likeCntDownByBoard" parameterType="com.board.seochu.finance.api.board.dto.BoardDto">
+        UPDATE TB_BOARD
+        SET LIKE_CNT = LIKE_CNT - 1
+        WHERE DOC_NO=#{docNo}
+    </update>
+
+    <select id="likeRead" parameterType="com.board.seochu.finance.api.board.dto.LikeDto" resultType="com.board.seochu.finance.api.board.dto.LikeDto">
+        SELECT likeno, boardno, mno, like_check, unLike_check
+          FROM TB_LIKETO
+         WHERE boardno=#{likeDto.boardno} AND mno=#{likeDto.mno}
+    </select>
+
+    <update id="unLikeCntUpByBoard" parameterType="com.board.seochu.finance.api.board.dto.BoardDto">
+        UPDATE TB_BOARD
+        SET UNLIKE_CNT = UNLIKE_CNT + 1
+        WHERE DOC_NO=#{docNo}
+    </update>
+
+    <update id="unLikeCntDownByBoard" parameterType="com.board.seochu.finance.api.board.dto.BoardDto">
+        UPDATE TB_BOARD
+        SET UNLIKE_CNT = UNLIKE_CNT - 1
+        WHERE DOC_NO=#{docNo}
+    </update>
+
+    <update id="checkByLike" parameterType="com.board.seochu.finance.api.board.dto.LikeDto">
+        UPDATE TB_LIKETO
+        SET unLike_check = unLike_check + 1
+        WHERE mno=#{likeDto.mno} AND boardno=#{likeDto.boardno}
+    </update>
+
+    <update id="checkByUnLike" parameterType="com.board.seochu.finance.api.board.dto.LikeDto">
+        UPDATE TB_LIKETO
+        SET unLike_check = 0
+        WHERE mno=#{likeDto.mno} AND boardno=#{likeDto.boardno}
+    </update>
 </mapper>
