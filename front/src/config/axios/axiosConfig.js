@@ -7,8 +7,6 @@ let getAxios = createInstance();
 function createInstance() {
   const getAxios = axios.create();
   getAxios.defaults.baseURL = "http://localhost:8080";
-  // getAxios.defaults.withCredentials = true;
-  // getAxios.defaults.crossDomain = true;
   getAxios.defaults.headers["Access-Control-Allow-Origin"] = "*";
   getAxios.defaults.headers["Access-Control-Allow-Methods"] =
     "GET,PUT,POST,DELETE,OPTIONS";
