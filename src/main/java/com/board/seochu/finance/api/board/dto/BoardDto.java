@@ -27,5 +27,8 @@ public class BoardDto {
     private String rows;
     private String page;
 
-   private String[] test;
+    private int like_cnt;
+    private int unLike_cnt;
+
+   private String[] convertSort;
 }
