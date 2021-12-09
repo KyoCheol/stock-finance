@@ -6,16 +6,17 @@ import COMMON_CONST from "../../config/common/commonConst";
 
 const state = {
   token: null,
+  user: null,
   // id: null,
   // name: null,
   // role: null,
   // email: null,
   // nickname: null,
-  user: null,
 };
 
 const getters = {
   token: (state) => state.token,
+  user: (state) => state.user,
   // id: (state) => state.id,
   // email: (state) => state.email,
   // nickname: (state) => state.nickname,
