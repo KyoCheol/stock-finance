@@ -1,38 +1,43 @@
 import router from "../../router/router";
 import axios from "axios";
 import COMMON_CONST from "../../config/common/commonConst";
+import VueCookies from "vue-cookies";
 
 //import { getAxios as axios } from "../../config/axios/axiosConfig";
 
 const state = {
   token: null,
   user: null,
-  // id: null,
-  // name: null,
-  // role: null,
-  // email: null,
-  // nickname: null,
+  accessToken: null,
+  refreshToken: null,
 };
 
 const getters = {
   token: (state) => state.token,
   user: (state) => state.user,
-  // id: (state) => state.id,
-  // email: (state) => state.email,
-  // nickname: (state) => state.nickname,
-  // role: (state) => state.role,
   loggedIn(state) {
     return !!state.user;
+  },
+  getToken() {
+    let ac = VueCookies.get("accessToken");
+    let rf = VueCookies.get("refreshToken");
+    return {
+      access: ac,
+      refresh: rf,
+    };
   },
 };
 
 const mutations = {
   login(state, item) {
+    VueCookies.set("accessToken", item.headers["accesstoken"], "60s");
+    VueCookies.set("refreshToken", item.headers["refreshtoken"], "1h");
+    state.accessToken = item.headers["accesstoken"];
+    state.refreshToken = item.headers["refreshtoken"];
+
+    //////////////////////////////////////////////////////////////////////
+
     state.token = item.headers["accesstoken"];
-    // state.id = item.data["id"];
-    // state.role = item.data["role"];
-    // state.email = item.data["email"];
-    // state.nickname = item.data["nickname"];
     state.user = item;
     localStorage.setItem("user", JSON.stringify(item));
     axios.defaults.headers.common["Authorization"] =
@@ -40,11 +45,12 @@ const mutations = {
     setTokenInLocalStorage(item);
     setAccessTokenInHeader(item.headers["accesstoken"]);
   },
+  refreshToken(state, item) {
+    VueCookies.set("accessToken", item.headers["accesstoken"], "60s");
+    VueCookies.set("refreshToken", item.headers["refreshtoken"], "1h");
+    state.accessToken = item.headers["accesstoken"];
+  },
   logout(state) {
-    // state.id = null;
-    // state.role = null;
-    // state.email = null;
-    // state.nickname = null;
     deleteTokenInLocalStorage();
     deleteAccessTokenInHeader();
     state.token = null;
@@ -75,6 +81,21 @@ const actions = {
         alert("로그인 요청에 문제가 발생했습니다.");
       });
   },
+  refreshtoken({ commit }) {
+    let url = "";
+
+    return new Promise((resolve, reject) => {
+      axios
+        .post(url)
+        .then((res) => {
+          commit("refreshToken", res.data);
+          resolve(res.data);
+        })
+        .catch((err) => {
+          reject(err.config.data);
+        });
+    });
+  },
   logout({ commit }) {
     commit("logout");
     //router.push("/");
@@ -82,8 +103,8 @@ const actions = {
 };
 
 const setTokenInLocalStorage = (tokenInfo) => {
-  localStorage.setItem("access_token", tokenInfo.access_token);
-  localStorage.setItem("refresh_token", tokenInfo.refresh_token);
+  localStorage.setItem("access_token", tokenInfo.headers["accesstoken"]);
+  localStorage.setItem("refresh_token", tokenInfo.headers["refreshtoken"]);
 };
 
 const deleteTokenInLocalStorage = () => {
