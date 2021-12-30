@@ -2,6 +2,14 @@ spring:
   profiles:
     active: local
 
+  cache:
+    type: redis
+
+  redis:
+    host: localhost
+    port: 6379
+    password: 123456
+
   datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
@@ -49,9 +57,7 @@ jwt:
 
 hendisantika:
   app:
-    jwtSecret: "jwtSecretKey"
-    jwtExpiration: 86400
-
+    jwtSecret: "secretKeytestauthorizationjwtmanagetokentestsetsetsetsetdddddddddddddddddddddd"
 
 # logging
 logging:
