@@ -1,6 +1,8 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 
+// import VueCookies from "vue-cookies";
+
 import homeScreen from "@/components/screen/homeScreen";
 
 import loginScreen from "@/components/screen/login/loginScreen";
@@ -70,3 +72,24 @@ const router = new VueRouter({
 });
 
 export default router;
+
+function freePass(uri) {
+  return uri === "/" || uri === "/login";
+}
+
+// 네비게잉션 가드(뷰 라우터로 url 접근에 대해서처리 할 수 있음)
+router.beforeEach(async (to, from, next) => {
+  /*
+   * to: 이동할 url 정보가 담긴 라우터 객체
+   * from: 현재 url 정보가 담긴 라우터 객체
+   * next: to에서 지정한 url로 이동하기 위해 꼭 호출해야하는 함수
+   * next()가 호출되기 전까지 화면 전환되지않음
+   * */
+  console.log("vue cookies > > > > > > > > ");
+  console.log(next);
+  console.log("routing : ", from.path, "->", to.path);
+
+  if (freePass(to.path)) {
+    next();
+  }
+});
