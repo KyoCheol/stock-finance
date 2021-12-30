@@ -15,16 +15,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByUsername(String username);
 
     Boolean existsByEmail(String email);
-
-    @Query(value =
-            "select count(*) " +
-                    "from users " +
-                    "where email = :email ", nativeQuery = true)
-    Integer countByEmail(@Param("email") String email);
-
-    @Query(value =
-            "select count(*) " +
-                    "from users " +
-                    "where mobile = :mobile ", nativeQuery = true)
-    Integer countByMobile(@Param("mobile") String mobile);
 }
