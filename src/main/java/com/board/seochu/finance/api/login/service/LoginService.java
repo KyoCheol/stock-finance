@@ -1,8 +1,8 @@
 package com.board.seochu.finance.api.login.service;
 
 import com.board.seochu.finance.api.login.dto.AuthenticationDto;
-import com.board.seochu.finance.api.login.dto.LoginDTO;
-import com.board.seochu.finance.api.login.dto.SignDTO;
+import com.board.seochu.finance.api.login.dto.LoginDto;
+import com.board.seochu.finance.api.login.dto.SignDto;
 import com.board.seochu.finance.api.role.domain.entity.Role;
 import com.board.seochu.finance.api.role.domain.entity.RoleName;
 import com.board.seochu.finance.api.role.domain.repository.RoleRepository;
@@ -11,12 +11,11 @@ import com.board.seochu.finance.api.user.domain.repository.UserRepository;
 import com.board.seochu.finance.exception.DuplicatedException;
 import com.board.seochu.finance.exception.ForbiddenException;
 import com.board.seochu.finance.exception.UserNotFoundException;
+import com.board.seochu.finance.util.salt.SaltUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,7 +36,10 @@ public class LoginService {
     @Autowired
     private final ModelMapper modelMapper;
 
-    public AuthenticationDto login(LoginDTO loginDto) {
+    @Autowired
+    private SaltUtil saltUtil;
+
+    public AuthenticationDto login(LoginDto loginDto) {
 
         // dto ---> entity
         User loginEntity = loginDto.toEntity();
@@ -53,7 +55,7 @@ public class LoginService {
         return authenticationDto;
     }
 
-    public User registerUser(SignDTO signDTO) {
+    public User registerUser(SignDto signDTO) {
 
         if (userRepository.existsByUsername(signDTO.getUsername()))
             throw new DuplicatedException("아이디 중복");
@@ -88,6 +90,10 @@ public class LoginService {
             }
         });
 
+
+//      String salt = saltUtil.genSalt();
+
+//        user.setPassword(saltUtil.encodePassword(salt, signDTO.getPassword()));
         user.setPassword(encoder.encode(signDTO.getPassword()));
         user.setRoles(roles);
 
