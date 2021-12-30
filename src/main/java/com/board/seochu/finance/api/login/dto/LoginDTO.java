@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 
 @Getter
 @Setter
-public class LoginDTO {
+public class LoginDto {
 //    @NotBlank
 //    @Size(min = 3, max = 60)
 //    private String username;
