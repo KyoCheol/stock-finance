@@ -3,7 +3,6 @@ package com.board.seochu.finance.api.board.controller;
 import com.board.seochu.finance.api.board.dto.BoardDto;
 import com.board.seochu.finance.api.board.dto.ReplyDto;
 import com.board.seochu.finance.api.board.service.BoardService;
-import com.board.seochu.finance.api.login.dto.SignDTO;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
