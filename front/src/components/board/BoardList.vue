@@ -73,6 +73,7 @@
 
 <script>
 import Button from "@/components/common/Button";
+
 export default {
   name: "App",
   components: { Button },
@@ -116,9 +117,7 @@ export default {
   },
   watch: {
     options: {
-      handler() {
-        this.getBoardList();
-      },
+      handler: "getBoardList",
       deep: true,
     },
   },
@@ -180,8 +179,8 @@ export default {
         );
       });
     },
-    onClickRow(event, data) {
-      this.movePage("/detail?docNo=" + data.item.docNo);
+    onClickRow(value) {
+      this.movePage("/detail?docNo=" + value.docNo);
     },
   },
 };
