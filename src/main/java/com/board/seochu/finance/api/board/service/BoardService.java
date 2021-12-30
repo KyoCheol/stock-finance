@@ -187,7 +187,7 @@ public class BoardService {
                 } else {
                     // 0
                     boardMapper.checkByUnLike(likeDto);
-                    boardMapper.unLikeCntDownByBoard(docNo);
+                    boardMapper.unLikeCntUpByBoard(docNo);
                 }
             }
         } catch(Exception e) {
