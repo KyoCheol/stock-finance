@@ -21,15 +21,15 @@ public class RedisUtil {
         return valueOperations.get(key);
     }
 
+    public void setData(String key, String value){
+        ValueOperations<String,String> valueOperations = redisTemplate.opsForValue();
+        valueOperations.set(key,value);
+    }
+
     // duration동안 (key, value)를 저장한다.
     public void setDataExpire(String key, String value, long duration) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        Duration expireDuration = Duration.ofMillis(duration);
-        log.info("key >>>>" + key);
-        log.info("value >>>>" + value);
-        log.info("duration >>>>" + duration);
-        log.info("expireDuration >>>>" + expireDuration);
-        log.info(valueOperations.toString());
+        Duration expireDuration = Duration.ofSeconds(duration);
         valueOperations.set(key, value, expireDuration);
     }
 
