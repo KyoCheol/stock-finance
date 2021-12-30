@@ -28,6 +28,13 @@
         </v-row>
         Content<br />
         <div style="height: 300px"><Viewer ref="viewer" /><br /></div>
+
+        <v-divider></v-divider>
+        <v-card-actions>
+          <upload-image></upload-image>
+        </v-card-actions>
+
+        <v-divider></v-divider>
         Reply ({{ replyCount }})<br />
         <v-simple-table dense>
           <tbody>
@@ -160,12 +167,14 @@
 import Viewer from "@/components/common/Viewer";
 import Tooltip from "@/components/common/Tooltip";
 import btnMixins from "@/config/common/btnMixins";
+import UploadImage from "@/components/common/ImageUpload";
 
 export default {
   mixins: [btnMixins],
   components: {
     Viewer,
     Tooltip,
+    UploadImage,
   },
   data: () => ({
     docNo: 0,
